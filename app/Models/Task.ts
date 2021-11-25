@@ -16,7 +16,13 @@ export default class Task extends BaseModel {
   public timeCost: string
 
   @column()
-  public isBillable: boolean
+  public isBillable?: boolean
+
+  @column()
+  public billRatio?: number
+
+  @column()
+  public currency?: string
 
   @column()
   public tags?: string[]
