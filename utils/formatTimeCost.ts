@@ -1,4 +1,4 @@
 import { Duration, DurationLikeObject } from 'luxon'
 
-export const getTimeCost = (duration: DurationLikeObject) =>
+export const formatTimeCost = (duration: DurationLikeObject) =>
   Duration.fromObject(duration).toISOTime()

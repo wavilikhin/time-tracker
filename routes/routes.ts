@@ -20,7 +20,9 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
-import './task.routes'
+import './tasks.routes'
+import './projects.routes'
+import './customers.routes'
 
 Route.get('health-check', async ({ response }) => {
   const report = await HealthCheck.getReport()

@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeSave, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeSave, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { Project, Task } from '.'
 
@@ -22,11 +22,15 @@ export default class User extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @hasMany(() => Task)
-  public tasks: HasMany<typeof Task>
+  @manyToMany(() => Task, {
+    pivotTable: 'user_tasks',
+  })
+  public tasks: ManyToMany<typeof Task>
 
-  @hasMany(() => Project)
-  public project: HasMany<typeof Project>
+  @manyToMany(() => Project, {
+    pivotTable: 'project_users',
+  })
+  public project: ManyToMany<typeof Project>
 
   @beforeSave()
   public static async hashPassword(user: User) {

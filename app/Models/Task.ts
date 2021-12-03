@@ -1,5 +1,12 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  column,
+  belongsTo,
+  BelongsTo,
+  manyToMany,
+  ManyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import { Project, User } from '.'
 
 export default class Task extends BaseModel {
@@ -33,8 +40,10 @@ export default class Task extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @belongsTo(() => User)
-  public user: BelongsTo<typeof User>
+  @manyToMany(() => User, {
+    pivotTable: 'user_tasks',
+  })
+  public user: ManyToMany<typeof User>
 
   @belongsTo(() => Project)
   public project: BelongsTo<typeof Project>
