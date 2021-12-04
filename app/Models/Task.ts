@@ -45,6 +45,8 @@ export default class Task extends BaseModel {
   })
   public user: ManyToMany<typeof User>
 
-  @belongsTo(() => Project)
+  @belongsTo(() => Project, {
+    foreignKey: 'id',
+  })
   public project: BelongsTo<typeof Project>
 }

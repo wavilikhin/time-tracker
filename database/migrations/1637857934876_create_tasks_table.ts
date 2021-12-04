@@ -8,7 +8,7 @@ export default class CreateTasksTables extends BaseSchema {
       table.increments('id').unsigned().primary()
       table.string('name', 50).notNullable()
       table.text('description').nullable()
-      table.string('timeCost').notNullable()
+      table.string('time_cost').notNullable()
       table.boolean('is_billable').nullable().defaultTo(false)
       table.integer('bill_ratio').nullable().defaultTo(0)
       table.string('currency').nullable().defaultTo('rubles')

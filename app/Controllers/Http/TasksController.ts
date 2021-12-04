@@ -1,5 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { Task } from '../../Models'
+import { Project, Task, User } from '../../Models'
 import { formatTimeCost } from '../../../utils/formatTimeCost'
 
 export default class TasksController {
@@ -10,16 +10,8 @@ export default class TasksController {
   public async store({ request, response }: HttpContextContract) {
     const { name, description, timeCost, isBillable, billRatio, currency, tags } = request.body()
 
-    console.log(
-      name,
-      description,
-      timeCost,
-      formatTimeCost(timeCost),
-      isBillable,
-      billRatio,
-      currency,
-      tags
-    )
+    const user1 = await User.findOrFail(1)
+    const project = await Project.findOrFail(1)
 
     const task = await Task.create({
       name,
@@ -31,7 +23,10 @@ export default class TasksController {
       tags,
     })
 
-    response.json(task)
+    await task.related('user').attach([user1.id])
+    await task.related('project').associate(project)
+
+    return response.json(task)
   }
 
   // show

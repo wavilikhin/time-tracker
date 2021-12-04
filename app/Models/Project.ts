@@ -25,7 +25,9 @@ export default class Project extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @belongsTo(() => Customer)
+  @belongsTo(() => Customer, {
+    foreignKey: 'id',
+  })
   public customer: BelongsTo<typeof Customer>
 
   @manyToMany(() => User, {
