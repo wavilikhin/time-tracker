@@ -15,11 +15,9 @@ export default class CreateUserValidator {
   })
 
   public messages = {
-    'name.required': 'Username is required',
+    'required': 'The {{ field }} is required to create a new user',
     'name.alpha': 'Username is invalid',
-    'email.required': 'Email is required',
     'email.email': 'Email is invalid',
     'email.unique': 'This email already exists',
-    'password.required': 'Password is required',
   }
 }

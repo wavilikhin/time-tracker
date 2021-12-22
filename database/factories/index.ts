@@ -4,7 +4,7 @@ import { Duration } from 'luxon'
 
 export const UserFactory = Factory.define(User, ({ faker }) => {
   return {
-    username: faker.internet.userName(),
+    name: faker.internet.userName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
   }
@@ -19,7 +19,6 @@ export const CustomerFactory = Factory.define(Customer, ({ faker }) => {
   }
 })
   .relation('projects', () => ProjectFactory)
-  .relation('tasks', () => TaskFactory)
   .build()
 
 export const ProjectFactory = Factory.define(Project, ({ faker }) => {

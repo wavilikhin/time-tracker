@@ -35,6 +35,8 @@ export default class Project extends BaseModel {
   })
   public user: BelongsTo<typeof User>
 
-  @hasMany(() => Task)
+  @hasMany(() => Task, {
+    foreignKey: 'id',
+  })
   public tasks: HasMany<typeof Task>
 }

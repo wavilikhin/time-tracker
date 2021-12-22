@@ -10,10 +10,12 @@ export default class ProjectsController {
     return User.all()
   }
 
-  public async store({ request }: HttpContextContract) {
+  public async store({ request, response }: HttpContextContract) {
     await request.validate(CreateUserValidator)
 
     const { name, email, password } = request.body()
+
+    response.status(201)
 
     return User.create({
       name,

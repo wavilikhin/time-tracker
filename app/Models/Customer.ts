@@ -4,11 +4,11 @@ import {
   column,
   hasMany,
   HasMany,
-  HasManyThrough,
-  hasManyThrough,
+  // HasManyThrough,
+  // hasManyThrough,
 } from '@ioc:Adonis/Lucid/Orm'
 import Project from './Project'
-import { Task } from '.'
+// import { Task } from '.'
 
 export default class Customer extends BaseModel {
   @column({ isPrimary: true })
@@ -23,9 +23,11 @@ export default class Customer extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @hasMany(() => Project)
+  @hasMany(() => Project, {
+    foreignKey: 'id',
+  })
   public projects: HasMany<typeof Project>
 
-  @hasManyThrough([() => Task, () => Project])
-  public tasks: HasManyThrough<typeof Task>
+  // @hasManyThrough([() => Task, () => Project])
+  // public tasks: HasManyThrough<typeof Task>
 }
