@@ -1,12 +1,5 @@
 import { DateTime } from 'luxon'
-import {
-  BaseModel,
-  column,
-  belongsTo,
-  BelongsTo,
-  manyToMany,
-  ManyToMany,
-} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
 import { Project, User } from '.'
 
 export default class Task extends BaseModel {
@@ -29,7 +22,7 @@ export default class Task extends BaseModel {
   public billRatio?: number
 
   @column()
-  public currency?: string
+  public currency: 'rub' | 'usd' | 'eur' = 'rub'
 
   @column()
   public tags?: string[]
@@ -40,10 +33,10 @@ export default class Task extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @manyToMany(() => User, {
-    pivotTable: 'user_tasks',
+  @belongsTo(() => User, {
+    foreignKey: 'id',
   })
-  public user: ManyToMany<typeof User>
+  public user: BelongsTo<typeof User>
 
   @belongsTo(() => Project, {
     foreignKey: 'id',

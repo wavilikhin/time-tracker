@@ -23,7 +23,7 @@ export default class TasksController {
       tags,
     })
 
-    await task.related('user').attach([user1.id])
+    await task.related('user').associate(user1)
     await task.related('project').associate(project)
 
     return response.json(task)

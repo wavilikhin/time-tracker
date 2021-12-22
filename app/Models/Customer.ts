@@ -1,6 +1,14 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  column,
+  hasMany,
+  HasMany,
+  HasManyThrough,
+  hasManyThrough,
+} from '@ioc:Adonis/Lucid/Orm'
 import Project from './Project'
+import { Task } from '.'
 
 export default class Customer extends BaseModel {
   @column({ isPrimary: true })
@@ -17,4 +25,7 @@ export default class Customer extends BaseModel {
 
   @hasMany(() => Project)
   public projects: HasMany<typeof Project>
+
+  @hasManyThrough([() => Task, () => Project])
+  public tasks: HasManyThrough<typeof Task>
 }

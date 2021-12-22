@@ -30,10 +30,10 @@ export default class Project extends BaseModel {
   })
   public customer: BelongsTo<typeof Customer>
 
-  @manyToMany(() => User, {
-    pivotTable: 'project_users',
+  @belongsTo(() => User, {
+    foreignKey: 'id',
   })
-  public user: ManyToMany<typeof User>
+  public user: BelongsTo<typeof User>
 
   @hasMany(() => Task)
   public tasks: HasMany<typeof Task>

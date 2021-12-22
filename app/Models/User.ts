@@ -28,9 +28,9 @@ export default class User extends BaseModel {
   public tasks: ManyToMany<typeof Task>
 
   @manyToMany(() => Project, {
-    pivotTable: 'project_users',
+    pivotTable: 'user_projects',
   })
-  public project: ManyToMany<typeof Project>
+  public projects: ManyToMany<typeof Project>
 
   @beforeSave()
   public static async hashPassword(user: User) {

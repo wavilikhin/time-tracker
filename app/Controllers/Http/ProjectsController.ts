@@ -16,7 +16,7 @@ export default class ProjectsController {
       name,
     })
 
-    await project.related('user').attach([user.id])
+    await project.related('user').associate(user)
     await project.related('customer').associate(customer)
 
     return response.json(project)

@@ -1,13 +1,13 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class CreateProjectUsersTables extends BaseSchema {
-  protected tableName = 'project_users'
+export default class CreateProjectCustomerTables extends BaseSchema {
+  protected tableName = 'customer_projects'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id').primary()
+      table.increments('id')
+      table.integer('customer_id').unsigned().notNullable().references('id').inTable('customers')
       table.integer('project_id').unsigned().notNullable().references('id').inTable('projects')
-      table.integer('user_id').unsigned().notNullable().references('id').inTable('users')
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })
