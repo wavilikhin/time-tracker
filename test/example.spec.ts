@@ -71,7 +71,7 @@ test.group('/users', (group) => {
     assert.equal(createdUser.email, sampleUser.email)
   })
 
-  test("[POST /] can't create user with the same email twice", async (assert) => {
+  test('[POST /] returns 422 on duplicate email', async (assert) => {
     const sampleUser = {
       name: 'Sample',
       email: 'sample@mail.com',
@@ -97,20 +97,20 @@ test.group('/users', (group) => {
     assert.equal(JSON.parse(req.error.text).errors[0].message, 'This email already exists')
   })
 
-  test("[POST /] can't create user without required fields", async (assert) => {
+  test('[POST /] returns 422 on invalid input', async (assert) => {
     const sampleUser1 = {
       name: 'Sample',
       password: 'sample123',
     }
 
     const sampleUser2 = {
-      email: 'sample@mail.com',
+      email: 'example@mail.com',
       password: 'sample123',
     }
 
     const sampleUser3 = {
       name: 'Sample',
-      email: 'sample@mail.com',
+      email: 'example@mail.com',
     }
 
     const failedReq1 = await supertest(BASE_URL)
@@ -153,24 +153,71 @@ test.group('/users', (group) => {
     )
   })
 
-  // show
+  test('[GET /:id] works as expected', async (assert) => {
+    // REFACTOR:
+    // [] - Maybe we should create UUIDs for each entity and use them here
+    const { body: users } = await supertest(BASE_URL)
+      .get('/users')
+      .set('Accept', 'application/json')
+      .expect(200)
 
+    const id = users[0].id
+
+    const { body: user } = await supertest(BASE_URL)
+      .get(`/users/${id}`)
+      .set('Accept', 'application/json')
+      .expect(200)
+
+    assert.deepEqual(users[0], user)
+  })
+
+  test("[GET /:id] returns 404 if user doesn't exists", async () => {
+    const id = 666
+
+    await supertest(BASE_URL).get(`/users/${id}`).set('Accept', 'application/json').expect(404)
+  })
+
+  // TODO: should return 422, take a look at validator
+  test('[GET /:id] returns 500 on invalid input', async () => {
+    const id = 'fff'
+
+    await supertest(BASE_URL).get(`/users/${id}`).set('Accept', 'application/json').expect(500)
+  })
   // update
+  // test('[PATCH /] works as expected', async (assert) => {
+  //   const updateUserData = {
+  //     email: 'updated@mail.com',
+  //     name: 'updatedName',
+  //     password: 'updatePassword',
+  //   }
+
+  //   const { body: users } = await supertest(BASE_URL)
+  //     .get('/users')
+  //     .set('Accept', 'application/json')
+  //     .expect(200)
+
+  //   const id = users[0].id
+
+  //   const { body: updatedUser } = await supertest(BASE_URL)
+  //     .patch('/users')
+  //     .send(updateUserData)
+  //     .set('Accept', 'application/json')
+  //     .expect(200)
+
+  //   // console.log('[ID]: ', updatedUser.id)
+  //   // // REFACTOR
+  //   // const { body: updatedUserFromDb } = await supertest(BASE_URL)
+  //   //   .get(`/users/${(updatedUser as any).id}`)
+  //   //   .set('Accept', 'application/json')
+  //   //   .expect(200)
+
+  //   // assert.deepEqual(updatedUser, updatedUserFromDb)
+  // })
+  // invalid input - 500
+  // not found - 404
+  // cant merge - 500
 
   // destroy
-
-  // test('ensure home page works', async () => {
-  //   await supertest(BASE_URL).get('/').expect(404)
-  // })
-
-  // test('ensure user password gets hashed during save', async (assert) => {
-  //   const user = new User()
-  //   user.email = 'virk@adonisjs.com'
-  //   user.password = 'secret'
-  //   await user.save()
-
-  //   assert.notEqual(user.password, 'secret')
-  // })
 
   group.afterEach(async () => {
     await Database.rollbackGlobalTransaction()

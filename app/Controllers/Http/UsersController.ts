@@ -41,6 +41,7 @@ export default class ProjectsController {
 
     const { name, email, password } = request.body()
 
+    console.log('NEW USER REQ: ', name, email, password)
     let user: User
     try {
       user = await User.findByOrFail('email', email)
