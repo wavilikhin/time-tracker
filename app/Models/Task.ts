@@ -1,10 +1,14 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
+import { nanoid } from 'nanoid/non-secure'
+import { BaseModel, column, belongsTo, BelongsTo, beforeSave } from '@ioc:Adonis/Lucid/Orm'
 import { Project, User } from '.'
 
 export default class Task extends BaseModel {
   @column({ isPrimary: true })
   public id: string
+
+  @column()
+  public taskId?: string
 
   @column()
   public name: string
@@ -42,4 +46,11 @@ export default class Task extends BaseModel {
     foreignKey: 'id',
   })
   public project: BelongsTo<typeof Project>
+
+  @beforeSave()
+  public static async generateTaskId(task: Task) {
+    if (!task.taskId) {
+      task.taskId = nanoid()
+    }
+  }
 }

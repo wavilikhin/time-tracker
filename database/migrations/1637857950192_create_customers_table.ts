@@ -6,6 +6,7 @@ export default class CreateCustomersTables extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').unsigned().primary()
+      table.string('customer_id').unsigned().notNullable()
       table.string('name', 50).notNullable().unique()
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })

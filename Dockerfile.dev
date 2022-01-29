@@ -1,0 +1,9 @@
+FROM node:16.13.1-alpine as deps
+ENV NODE_ENV development
+EXPOSE 3333
+WORKDIR /opt/app/time-tracker
+RUN apk add dumb-init
+COPY package*.json yarn.lock /opt/app/time-tracker/
+RUN yarn
+COPY . .
+CMD ["yarn", "dev"]

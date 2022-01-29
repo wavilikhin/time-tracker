@@ -15,8 +15,8 @@ export default class IndexSeeder extends BaseSeeder {
   }
 
   public async run() {
-    await this.runSeeder(await import('../Customer'))
     await this.runSeeder(await import('../User'))
+    await this.runSeeder(await import('../Customer'))
     await this.runSeeder(await import('../Project'))
     await this.runSeeder(await import('../Task'))
   }

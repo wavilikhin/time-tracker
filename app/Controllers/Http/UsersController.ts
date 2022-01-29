@@ -1,8 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import CreateUserValidator from 'App/Validators/CreateUserValidator'
-import { deleteUserByIdValidator } from 'App/Validators/DeleteUserByIdValidator'
 import { getUserByIdValidator } from 'App/Validators/GetUserByIdValidator'
-import UpdateUserValidator from 'App/Validators/UpdateUserValidator'
 import { User } from '../../Models'
 
 export default class ProjectsController {
@@ -30,46 +28,19 @@ export default class ProjectsController {
     const { id } = request.params()
 
     try {
-      return User.findOrFail(id)
+      return User.findByOrFail('user_id', id)
     } catch (error) {
       return response.notFound()
     }
   }
 
-  public async update({ request, response }: HttpContextContract) {
-    await request.validate(UpdateUserValidator)
-
-    const { name, email, password } = request.body()
-
-    console.log('NEW USER REQ: ', name, email, password)
-    let user: User
-    try {
-      user = await User.findByOrFail('email', email)
-    } catch (error) {
-      return response.status(404)
-    }
-
-    try {
-      user.merge({
-        name: name ? name : user.name,
-        password,
-      })
-
-      return user.save()
-    } catch (error) {
-      return response.internalServerError()
-    }
-  }
-
   public async destroy({ request, response }: HttpContextContract) {
-    await deleteUserByIdValidator(request)
-
     const { id } = request.params()
 
     let user: User
 
     try {
-      user = await User.findOrFail(id)
+      user = await User.findByOrFail('user_id', id)
     } catch (error) {
       return response.status(404)
     }

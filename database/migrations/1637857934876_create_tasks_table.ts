@@ -6,6 +6,7 @@ export default class CreateTasksTables extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').unsigned().primary()
+      table.string('task_id').unsigned().notNullable()
       table.string('name', 50).notNullable()
       table.text('description').nullable()
       table.string('time_cost').notNullable()

@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { nanoid } from 'nanoid/non-secure'
 import { BaseModel, beforeSave, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { Project, Task } from '.'
@@ -6,6 +7,9 @@ import { Project, Task } from '.'
 export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: number
+
+  @column()
+  public userId?: string
 
   @column()
   public name: string
@@ -36,6 +40,13 @@ export default class User extends BaseModel {
   public static async hashPassword(user: User) {
     if (user.$dirty.password) {
       user.password = await Hash.make(user.password)
+    }
+  }
+
+  @beforeSave()
+  public static async generateUserId(user: User) {
+    if (!user.userId) {
+      user.userId = nanoid()
     }
   }
 }

@@ -1,18 +1,14 @@
 import { DateTime } from 'luxon'
-import {
-  BaseModel,
-  column,
-  hasMany,
-  HasMany,
-  // HasManyThrough,
-  // hasManyThrough,
-} from '@ioc:Adonis/Lucid/Orm'
+import { nanoid } from 'nanoid/non-secure'
+import { BaseModel, beforeSave, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import Project from './Project'
-// import { Task } from '.'
 
 export default class Customer extends BaseModel {
   @column({ isPrimary: true })
   public id: string
+
+  @column()
+  public customerId?: string
 
   @column()
   public name: string
@@ -28,6 +24,10 @@ export default class Customer extends BaseModel {
   })
   public projects: HasMany<typeof Project>
 
-  // @hasManyThrough([() => Task, () => Project])
-  // public tasks: HasManyThrough<typeof Task>
+  @beforeSave()
+  public static async generateCustomerId(customer: Customer) {
+    if (!customer.customerId) {
+      customer.customerId = nanoid()
+    }
+  }
 }

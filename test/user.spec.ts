@@ -1,32 +1,26 @@
 import test from 'japa'
 import supertest from 'supertest'
-import { User } from 'App/Models'
 import Database from '@ioc:Adonis/Lucid/Database'
 import { UserFactory } from 'Database/factories'
+import { nanoid } from 'nanoid/non-secure'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
 
-const TOTAL_USERS_COUNT = 6
+const TOTAL_USERS_COUNT = 3
+
+const fakeIds = [nanoid(), nanoid()]
 const fakeUsers = [
   {
     name: 'John',
+    userId: fakeIds[0],
     email: 'foo@example.com',
     password: '12345',
   },
   {
     name: 'Ann',
+    userId: fakeIds[1],
     email: 'bar@example.com',
     password: 'asdfg',
-  },
-  {
-    name: 'Ted',
-    email: 'baz@example.com',
-    password: '12dasf',
-  },
-  {
-    name: 'Swam',
-    email: 'foobar@example.com',
-    password: 'dals01',
   },
 ]
 
@@ -34,7 +28,7 @@ test.group('/users', (group) => {
   group.beforeEach(async () => {
     await Database.beginGlobalTransaction()
 
-    await UserFactory.merge(fakeUsers).createMany(6)
+    await UserFactory.merge(fakeUsers).createMany(TOTAL_USERS_COUNT)
   })
 
   test('[GET /] works as expected', async (assert) => {
@@ -48,11 +42,6 @@ test.group('/users', (group) => {
         true
       )
     })
-
-    assert.equal(
-      users.some((u) => u.email === 'doesNotexist'),
-      false
-    )
   })
 
   test('[POST /] works as expected', async (assert) => {
@@ -78,13 +67,11 @@ test.group('/users', (group) => {
       password: 'sample123',
     }
 
-    const { body: createdUser } = await supertest(BASE_URL)
+    await supertest(BASE_URL)
       .post('/users')
       .send(sampleUser)
       .set('Accept', 'application/json')
       .expect(201)
-
-    assert.equal(createdUser.email, sampleUser.email)
 
     const req = await supertest(BASE_URL)
       .post('/users')
@@ -97,20 +84,10 @@ test.group('/users', (group) => {
     assert.equal(JSON.parse(req.error.text).errors[0].message, 'This email already exists')
   })
 
-  test('[POST /] returns 422 on invalid input', async (assert) => {
+  test('[POST /] returns 422 if no email provided', async (assert) => {
     const sampleUser1 = {
       name: 'Sample',
       password: 'sample123',
-    }
-
-    const sampleUser2 = {
-      email: 'example@mail.com',
-      password: 'sample123',
-    }
-
-    const sampleUser3 = {
-      name: 'Sample',
-      email: 'example@mail.com',
     }
 
     const failedReq1 = await supertest(BASE_URL)
@@ -125,6 +102,13 @@ test.group('/users', (group) => {
       JSON.parse(failedReq1.error.text).errors[0].message,
       'The email is required to create a new user'
     )
+  })
+
+  test('[POST /] returns 422 if name in not provided', async (assert) => {
+    const sampleUser2 = {
+      email: 'example@mail.com',
+      password: 'sample123',
+    }
 
     const failedReq2 = await supertest(BASE_URL)
       .post('/users')
@@ -138,6 +122,13 @@ test.group('/users', (group) => {
       JSON.parse(failedReq2.error.text).errors[0].message,
       'The name is required to create a new user'
     )
+  })
+
+  test('[POST /] returns 422 if password not provided', async (assert) => {
+    const sampleUser3 = {
+      name: 'Sample',
+      email: 'example@mail.com',
+    }
 
     const failedReq3 = await supertest(BASE_URL)
       .post('/users')
@@ -154,21 +145,13 @@ test.group('/users', (group) => {
   })
 
   test('[GET /:id] works as expected', async (assert) => {
-    // REFACTOR:
-    // [] - Maybe we should create UUIDs for each entity and use them here
-    const { body: users } = await supertest(BASE_URL)
-      .get('/users')
-      .set('Accept', 'application/json')
-      .expect(200)
-
-    const id = users[0].id
-
     const { body: user } = await supertest(BASE_URL)
-      .get(`/users/${id}`)
+      .get(`/users/${fakeIds[0]}`)
       .set('Accept', 'application/json')
       .expect(200)
 
-    assert.deepEqual(users[0], user)
+    assert.equal(user.email, fakeUsers[0].email)
+    assert.equal(user.name, fakeUsers[0].name)
   })
 
   test("[GET /:id] returns 404 if user doesn't exists", async () => {
@@ -177,47 +160,24 @@ test.group('/users', (group) => {
     await supertest(BASE_URL).get(`/users/${id}`).set('Accept', 'application/json').expect(404)
   })
 
-  // TODO: should return 422, take a look at validator
-  test('[GET /:id] returns 500 on invalid input', async () => {
-    const id = 'fff'
+  test('[DELETE /:id] works as expected', async () => {
+    await supertest(BASE_URL)
+      .delete(`/users/${fakeIds[0]}`)
+      .set('Accept', 'application/json')
+      .expect(200)
 
-    await supertest(BASE_URL).get(`/users/${id}`).set('Accept', 'application/json').expect(500)
+    await supertest(BASE_URL)
+      .get(`/users/${fakeIds[0]}`)
+      .set('Accept', 'application/json')
+      .expect(404)
   })
-  // update
-  // test('[PATCH /] works as expected', async (assert) => {
-  //   const updateUserData = {
-  //     email: 'updated@mail.com',
-  //     name: 'updatedName',
-  //     password: 'updatePassword',
-  //   }
 
-  //   const { body: users } = await supertest(BASE_URL)
-  //     .get('/users')
-  //     .set('Accept', 'application/json')
-  //     .expect(200)
-
-  //   const id = users[0].id
-
-  //   const { body: updatedUser } = await supertest(BASE_URL)
-  //     .patch('/users')
-  //     .send(updateUserData)
-  //     .set('Accept', 'application/json')
-  //     .expect(200)
-
-  //   // console.log('[ID]: ', updatedUser.id)
-  //   // // REFACTOR
-  //   // const { body: updatedUserFromDb } = await supertest(BASE_URL)
-  //   //   .get(`/users/${(updatedUser as any).id}`)
-  //   //   .set('Accept', 'application/json')
-  //   //   .expect(200)
-
-  //   // assert.deepEqual(updatedUser, updatedUserFromDb)
-  // })
-  // invalid input - 500
-  // not found - 404
-  // cant merge - 500
-
-  // destroy
+  test('[DELETE /:id] returns 404 if user not found', async () => {
+    await supertest(BASE_URL)
+      .delete(`/users/${12345}`)
+      .set('Accept', 'application/json')
+      .expect(404)
+  })
 
   group.afterEach(async () => {
     await Database.rollbackGlobalTransaction()
